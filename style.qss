@@ -1,0 +1,14 @@
+.QPushButton
+{
+    color:white;
+    background-color:red;
+    border-radius:30px;
+}
+QLabel
+{
+font:bold;
+font-size:30px;
+background-color:green;
+color:black;
+
+}

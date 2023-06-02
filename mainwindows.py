@@ -16,7 +16,7 @@ from PyQt5 import QtCore
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, \
     QGridLayout, QVBoxLayout, QHBoxLayout, QMenuBar, QStatusBar, QSizePolicy,QTextEdit
-
+from tools.common_helper import CommonHelper
 '''
 QtWidgets.QWidget()感觉就是在哪个控件上生成一个QWidget，就是父控件和子控件
 '''
@@ -71,13 +71,22 @@ class Ui_MainWindow(object):
         self.gridLayoutWidget.setLayout(self.gridLayout_2)
         #设置Margins (left,top,right,bottom) 默认白色
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
+        #设置网格之间的间隙
+        # self.gridLayout_2.setSpacing(20)
+        # 设置垂直网格间距：setVerticalSpacing(spacing)
+        # 设置水平网格间距：setHorizontalSpacing(spacing)
         self.gridLayout_2.setObjectName("gridLayout_2")
+
+        # 加载QSS样式文件
+        self.stylefile = 'style.qss'
+        self.qssstyle = CommonHelper.readQSS(self.stylefile)
 
         self.listbutton = []
         #添加pushbutton到gridLayout_2
         for i in range(2):
             for j in range(4):
                 button  = QPushButton('({},{})'.format(i,j))
+                button.setStyleSheet(self.qssstyle)
                 #需要使用样式表来设置pushbutton 样式，QSS
                 # button.setStyleSheet("border-radius:15px;")
                 button.setSizePolicy (QSizePolicy.Expanding, QSizePolicy.Expanding)
