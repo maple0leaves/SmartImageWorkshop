@@ -32,7 +32,7 @@ class Example(QMainWindow):
         self.buttonwidget = QWidget()
 
         self.centergridLayout.addWidget(self.titlewidget,0,0,1,1)
-        #要修改行列大小占比，一般使用setsetRowStretch,和setColumnStretch
+        #要修改行列大小占比，一般使用setRowStretch,和setColumnStretch
         #在一定情况下也可以修改占据多少行
         self.centergridLayout.setRowStretch(0,1)
         self.centergridLayout.addWidget(self.buttonwidget,1,0,1,1)
@@ -54,7 +54,6 @@ class Example(QMainWindow):
         self.buttongrid.addWidget(self.button2,2,0)
 
 
-        #
         # self.vbox = QVBoxLayout(self.centeralwidget)
         # edit = QTextEdit()
         # self.vbox.addWidget(edit)
