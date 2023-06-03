@@ -13,10 +13,12 @@
 #在self.centralwidget中添加girdLayout，然后在合适的行列中添加widget，然后再添加girdlayout
 #在gridlayout添加2x4=8个button
 from PyQt5 import QtCore
-from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont, QCursor, QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, \
     QGridLayout, QVBoxLayout, QHBoxLayout, QMenuBar, QStatusBar, QSizePolicy,QTextEdit
 from tools.common_helper import CommonHelper
+
 '''
 QtWidgets.QWidget()感觉就是在哪个控件上生成一个QWidget，就是父控件和子控件
 '''
@@ -45,6 +47,7 @@ class Ui_MainWindow(object):
         self.cwgridLayout.setRowStretch(0,1)
         self.cwgridLayout.setRowStretch(1,1)
         self.centralwidget.setLayout(self.cwgridLayout)
+        self.centralwidget.setStyleSheet('QWidget{background-color:white;}')
 
         self.titlelabel = QLabel('Title')
         #设置文字居中
@@ -70,9 +73,9 @@ class Ui_MainWindow(object):
         self.gridLayout_2 = QGridLayout()
         self.gridLayoutWidget.setLayout(self.gridLayout_2)
         #设置Margins (left,top,right,bottom) 默认白色
-        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_2.setContentsMargins(20, 0, 20, 0)
         #设置网格之间的间隙
-        # self.gridLayout_2.setSpacing(20)
+        self.gridLayout_2.setSpacing(40)
         # 设置垂直网格间距：setVerticalSpacing(spacing)
         # 设置水平网格间距：setHorizontalSpacing(spacing)
         self.gridLayout_2.setObjectName("gridLayout_2")
@@ -81,17 +84,33 @@ class Ui_MainWindow(object):
         self.stylefile = 'style.qss'
         self.qssstyle = CommonHelper.readQSS(self.stylefile)
 
-        self.listbutton = []
+
+        '''
+        from PyQt5.QtCore import Qt
+        self.button.setCursor(QCursor(Qt.PointingHandCursor))
+        '''
+        self.listlabel = []
         #添加pushbutton到gridLayout_2
         for i in range(2):
             for j in range(4):
-                button  = QPushButton('({},{})'.format(i,j))
-                button.setStyleSheet(self.qssstyle)
+                # label  = QLabel('({},{})'.format(i,j))
+                label  = QLabel()
+                label.setCursor(QCursor(Qt.PointingHandCursor))
+                label.setStyleSheet(self.qssstyle)
                 #需要使用样式表来设置pushbutton 样式，QSS
                 # button.setStyleSheet("border-radius:15px;")
-                button.setSizePolicy (QSizePolicy.Expanding, QSizePolicy.Expanding)
-                self.gridLayout_2.addWidget(button,i,j,1,1)
-                self.listbutton.append(button)
+                label.setSizePolicy (QSizePolicy.Expanding, QSizePolicy.Expanding)
+                self.gridLayout_2.addWidget(label,i,j,1,1)
+                self.listlabel.append(label)
+        '''
+        attention
+        '''
+
+        # pix = QPixmap('images/img_1.png')
+        self.listlabel[0].setStyleSheet(self.qssstyle)
+        self.listlabel[0].setAlignment(Qt.AlignCenter)
+        # self.listlabel[0].setPixmap(pix)
+        self.listlabel[0].setScaledContents(True)
 
         #给MainWindow设置中心Widget
         MainWindow.setCentralWidget(self.centralwidget)

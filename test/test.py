@@ -2,7 +2,8 @@
 # author:leo
 # date:
 # email:alplf123@163.com
-
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QWidget, QVBoxLayout, QFrame, QGridLayout, QSizePolicy
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, \
@@ -40,7 +41,9 @@ class Example(QMainWindow):
 
         self.buttongrid = QGridLayout()
         self.buttonwidget.setLayout(self.buttongrid)
-        self.button =  QPushButton("button")
+        self.button =  QLabel("Label")
+        self.button.setCursor(QCursor(Qt.PointingHandCursor))
+
         #让pushbutton在gridlayout中可以随布局变化而调整大小
         self.button.setSizePolicy (QSizePolicy.Expanding, QSizePolicy.Expanding)
 
