@@ -1,23 +1,73 @@
-QPushButton
+MyQLabel#mattinglabel
 {
-    color:white;
-    background-color:red;
-    border-radius:30px;
-}
-QLabel
-{
-    font:bold;
-    font-size:60px;
-    border:2px solid #C0C0C0;
-    border-image:url(./images/11img_1.png);
-    background-color:white;
+    border-image:url(./images/matting1.png);
     border-radius: 20px;
-    color:black;
 }
-QLabel:hover{
-	color: black;
-	border-color: #C0C0C0;
-    background-color: #e5f3ff;
-    border-image:url(./images/1img_1.png)
+MyQLabel#mattinglabel:hover{
+    border-image:url(./images/matting2.png)
 }
+
+MyQLabel#animelabel
+{
+    border-image:url(./images/anime1.png);
+    border-radius: 20px;
+}
+MyQLabel#animelabel:hover{
+    border-image:url(./images/anime2.png)
+}
+
+MyQLabel#imguplabel
+{
+    border-image:url(./images/imgup1.png);
+    border-radius: 20px;
+}
+MyQLabel#imguplabel:hover{
+    border-image:url(./images/imgup2.png)
+}
+
+MyQLabel#filterlabel
+{
+    border-image:url(./images/filter1.png);
+    border-radius: 20px;
+}
+MyQLabel#filterlabel:hover{
+    border-image:url(./images/filter2.png)
+}
+
+MyQLabel#sketchlabel
+{
+    border-image:url(./images/sketch1.png);
+    border-radius: 20px;
+}
+MyQLabel#sketchlabel:hover{
+    border-image:url(./images/sketch2.png)
+}
+
+MyQLabel#mosaiclabel
+{
+    border-image:url(./images/mosaic1.png);
+    border-radius: 20px;
+}
+MyQLabel#mosaiclabel:hover{
+    border-image:url(./images/mosaic2.png)
+}
+
+MyQLabel#idlabel
+{
+    border-image:url(./images/id1.png);
+    border-radius: 20px;
+}
+MyQLabel#idlabel:hover{
+    border-image:url(./images/id2.png)
+}
+
+MyQLabel#morelabel
+{
+    border-image:url(./images/more1.png);
+    border-radius: 20px;
+}
+MyQLabel#morelabel:hover{
+    border-image:url(./images/more2.png)
+}
+
 
