@@ -12,8 +12,8 @@
 #在gridlayout添加2x4=8个button
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont, QCursor, QPixmap
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QFont, QCursor, QPixmap, QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, \
     QGridLayout, QVBoxLayout, QHBoxLayout, QMenuBar, QStatusBar, QSizePolicy,QTextEdit
 from tools.common_helper import CommonHelper
@@ -29,6 +29,9 @@ class Ui_MainWindow(object):
     '''这自动生成的代码有够逆天的，实例变量都不放在__init__里面'''
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
+        #set logo and Window name
+        MainWindow.setWindowTitle("智能图象处理")
+        MainWindow.setWindowIcon(QIcon('./images/logo.png'))
         # 获取显示器分辨率
         self.desktop = QApplication.desktop()
         self.screenRect = self.desktop.screenGeometry()
@@ -53,7 +56,20 @@ class Ui_MainWindow(object):
         self.centralwidget.setStyleSheet('QWidget{background-color:white;}')
 
         #this titlelabel use to show some result imgs
-        self.titlelabel = QLabel('Title')
+        #chang img in titlelabel a period of time
+        self.titlelabel = MyQLabel('title')
+        self.n = 1
+        self.lu = "./images/img" + str(self.n) + ".png"
+        self.pm = QPixmap(self.lu)
+        self.titlelabel.setPixmap(self.pm)
+        #set img suit label automatically
+        # self.titlelabel.setScaledContents(True)
+        # self.titlelabel.connect_customized()
+        self.timer1 = QTimer(MainWindow)
+        self.timer1.timeout.connect(self.timer_TimeOut)
+        self.timer1.start(2000)  # 图片间隔时长
+
+
         #设置文字居中
         self.titlelabel.setAlignment(QtCore.Qt.AlignCenter)
         #set font style
@@ -194,7 +210,13 @@ class Ui_MainWindow(object):
         # 设置label随着布局大小变化
         self.morelabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.gridLayout_2.addWidget(self.morelabel, 1, 3, 1, 1)
-
+    def timer_TimeOut(self):
+        self.n += 1
+        if self.n > 3:
+            self.n = 1
+        self.lu = "./images/img" + str(self.n) + ".png"
+        self.pm = QPixmap(self.lu)
+        self.titlelabel.setPixmap(self.pm)
 
 '''
 1.弄8套QLabel images  
