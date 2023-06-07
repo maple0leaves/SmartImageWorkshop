@@ -50,16 +50,28 @@ class filterwindow(QWidget):
         self.grid.setColumnStretch(0,1)
         self.grid.setColumnStretch(1,3)
         self.grid.setColumnStretch(2,3)
+        self.grid.setColumnStretch(3,3)
         self.grid.addWidget(self.bwLabel,0,0)
         self.grid.addWidget(self.cclabel,1,0)
         self.grid.addWidget(self.delabel,2,0)
         self.grid.addWidget(self.cllabel,3,0)
-        label = MyQLabel("saojioa")
-        label.setAlignment(Qt.AlignCenter)
-
-        self.grid.addWidget(label,4,1)
+        self.bwwidget()
+        # label = MyQLabel("saojioa")
+        # label2 = MyQLabel("saojioa")
+        # label.setAlignment(Qt.AlignCenter)
+        #
+        # self.grid.addWidget(label,4,1)
+        # self.grid.addWidget(label2,5,1)
 
         self.setLayout(self.grid)
+
+    def bwwidget(self):
+        self.wid = QWidget()
+        self.grid.addWidget(self.wid,0,1,6,3)
+        self.widgridlayout = QGridLayout()
+
+
+
 if __name__ =='__main__':
     app = QApplication(sys.argv)
     fw = filterwindow()
