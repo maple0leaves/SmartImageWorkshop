@@ -66,6 +66,7 @@ class filterwindow(QWidget):
         self.setLayout(self.grid)
 
     def bwwidget(self):
+        # layout row 4 ,column 6
         self.wid = QWidget()
         self.grid.addWidget(self.wid,0,1,6,3)
         self.widgridlayout = QGridLayout()
