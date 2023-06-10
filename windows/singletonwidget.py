@@ -1,9 +1,12 @@
 import  sys
-from PyQt5.QtGui import QCursor, QPixmap, QIcon
-from PyQt5.QtWidgets import QWidget, QGridLayout, QApplication, QFrame, QFileDialog, QSlider, QVBoxLayout
+
+import cv2
+from PyQt5.QtGui import QCursor, QPixmap, QIcon, QImage
+from PyQt5.QtWidgets import QWidget, QGridLayout, QApplication, QFrame, QFileDialog, QSlider, QVBoxLayout, QMessageBox
 from PyQt5.QtCore import Qt
 
 from tools.ImgAdapter import ImgAdapter
+from tools.ImgConverter import ImgConverter
 from tools.MyLabel import MyQLabel
 
 
@@ -22,7 +25,7 @@ class singletonwidget(QWidget):
     '''
     this class use to process filter img
     '''
-    def __init__(self,name='黑白'):
+    def __init__(self,name=''):
         super().__init__()
         self.setWindowTitle("智能图象处理")
         self.setWindowIcon(QIcon('../images/logo.png'))
@@ -32,9 +35,7 @@ class singletonwidget(QWidget):
         self.pixmap=None
         #new img
         self.newimg = None
-        #暂存originlabel、newlabel的height、width
-        self.oh = None
-        self.ow = None
+
         self.desktop = QApplication.desktop()
         self.screenRect = self.desktop.screenGeometry()
         self.screenheight = self.screenRect.height()
@@ -43,20 +44,27 @@ class singletonwidget(QWidget):
         self.width = int(self.screenwidth * 0.7)
         #设置大小
         self.resize(self.width, self.height)
+        #originlabel、newlabel在默认状态下的height、width
+        self.oh =self.height*0.9
+        self.ow = self.width*0.5
         # self.widget's layout
         self.gridlayout = QGridLayout()
         self.setLayout(self.gridlayout)
-        # put 3 Label layout
-        self.gridlayout2 =QGridLayout()
+
 
         self.originlabel = MyQLabel('原图')
         self.originlabel.setFrameShape(QFrame.Box)
         self.originlabel.setAlignment(Qt.AlignCenter)
+        self.originlabel.setMinimumSize(int(self.width*0.5),int(self.height*0.9))
+        self.originlabel.setMaximumSize(int(self.screenwidth*0.5),int(self.screenheight*0.9))
 
         self.newlabel = MyQLabel('新图片')
         self.newlabel.setAlignment(Qt.AlignCenter)
         self.newlabel.setFrameShape(QFrame.Box)
-
+        self.newlabel.setMinimumSize(int(self.width*0.5),int(self.height*0.9))
+        self.newlabel.setMaximumSize(int(self.screenwidth*0.5),int(self.screenheight*0.9))
+        # put 3 Label layout
+        self.gridlayout2 =QGridLayout()
         self.uplabel = MyQLabel('上传图片')
         self.uplabel.setStyleSheet('QLabel:hover{background-color:#e5f3ff}')
         self.uplabel.setMinimumSize(int(self.width*0.33),int(self.height*0.1))
@@ -107,6 +115,8 @@ class singletonwidget(QWidget):
     def setUI(self):
         self.gridlayout.setRowStretch(0,7)
         self.gridlayout.setRowStretch(1,1)
+        self.gridlayout.setColumnStretch(0,1)
+        self.gridlayout.setColumnStretch(1,1)
         self.gridlayout.addWidget(self.originlabel,0,0,1,1)
         self.gridlayout.addWidget(self.newlabel,0,1,1,1)
         self.gridlayout.addLayout(self.gridlayout2,1,0,1,2)
@@ -122,12 +132,17 @@ class singletonwidget(QWidget):
         self.downloadlabel.connect_customized(self.save_image)
 
     def open_image(self):
-        oheight = self.height*0.9
-        owidth = self.width*0.5
+
+        if self.isMaximized():
+            oheight = self.screenheight * 0.9
+            owidth = self.screenwidth * 0.49
+        else:
+            oheight = self.height*0.9
+            owidth = self.width*0.5
+        print("是否最大化",self.isMaximized())
         #if i write in setUI() or __init__(),I can not get true size
         #so I get size in this func, I can not think better way to solve now
-        self.oh =oheight
-        self.ow = owidth
+
         filename, _ = QFileDialog.getOpenFileName(None, "Open Image", ".", "Images (*.png *.jpg *.bmp)")
         if filename:
             self.pixmap = QPixmap(filename)
@@ -135,10 +150,13 @@ class singletonwidget(QWidget):
             self.originlabel.setPixmap(pixmap)
 
     def save_image(self):
-        file_name, _ = QFileDialog.getSaveFileName(None, "Save Image", ".", "Images (*.png *.jpg *.bmp)")
-        if file_name:
-            # pixmap = QPixmap('image.jpg')  # 假设要保存的图片名为 image.jpg
-            self.pixmap.save(file_name)
+        if self.newimg is None:
+            QMessageBox.information(self, '提示', '请先处理图片',
+                                    QMessageBox.Yes )
+        else:
+            file_name, _ = QFileDialog.getSaveFileName(None, "Save Image", ".", "Images (*.png *.jpg *.bmp)")
+            if file_name:
+                self.newimg.save(file_name)
 
     '''changeEvent方法可以捕捉其他窗口状态的改变，例如窗口最大化，窗口还原
     窗口最小化、窗口关闭等'''
@@ -146,30 +164,57 @@ class singletonwidget(QWidget):
         if event.type() == event.WindowStateChange:
             if self.isMinimized():
               pass
-            elif self.isMaximized(): #因为这里包含两种情况，最大化和还原，所以放在else中
+            elif self.isMaximized():
                 if self.pixmap is not None:
                     oheight = self.originlabel.height()
                     owidth = self.originlabel.width()
                     pixmap = ImgAdapter.adapteSize(self.pixmap,owidth,oheight)
-                    print(pixmap==self.pixmap)
                     self.originlabel.setPixmap(pixmap)
+                if self.newimg is not None:
+                    oheight = self.newlabel.height()
+                    owidth = self.newlabel.width()
+                    pixmap = ImgAdapter.adapteSize(self.newimg, owidth, oheight)
+                    self.newlabel.setPixmap(pixmap)
             else:
                 if self.pixmap is not None:
                     oheight = self.oh
                     owidth = self.ow
                     pixmap = ImgAdapter.adapteSize(self.pixmap,owidth,oheight)
                     self.originlabel.setPixmap(pixmap)
+                if self.newimg is not None:
+                    oheight = self.oh
+                    owidth = self.ow
+                    pixmap = ImgAdapter.adapteSize(self.newimg,owidth,oheight)
+                    self.newlabel.setPixmap(pixmap)
         event.accept()
+
     def update_labels(self):
         self.label_min.setText(str(self.slider.minimum()))
         self.label_max.setText(str(self.slider.maximum()))
     def processimg(self):
-        if self.labelname=='黑白':
-            pass
-        elif self.labelname=='反色':
-            pass
-        elif self.labelname=='磨皮':
-            pass
+        if self.pixmap is None:
+            QMessageBox.information(self, '提示', '请先上传图片',
+                                    QMessageBox.Yes )
+        else:
+            if self.labelname=='黑白':
+                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
+                img_gray = cv2.cvtColor(cvimg, cv2.COLOR_RGB2GRAY)
+                height, width = img_gray.shape
+                bytes_per_line = width
+                q_image = QImage(img_gray.data, width, height, bytes_per_line, QImage.Format_Grayscale8)
+                # 将灰度图像转换为QPixmap
+                self.newimg = QPixmap.fromImage(q_image)
+                # print("self.origin",self.pixmap.width(),self.pixmap.height())
+                # print("self.newimg",self.newimg.width(),self.newimg.height())
+                # print("self.originlabel",self.originlabel.width(),self.originlabel.height())
+                # print("self.newlabel",self.newlabel.width(),self.newlabel.height())
+                pixmap = ImgAdapter.adapteSize(self.newimg,self.newlabel.width(),self.newlabel.height())
+                self.newlabel.setPixmap(pixmap)
+
+            elif self.labelname=='反色':
+                pass
+            elif self.labelname=='磨皮':
+                pass
 
 if __name__=='__main__':
     app =QApplication(sys.argv)
