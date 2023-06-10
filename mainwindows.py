@@ -16,8 +16,10 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont, QCursor, QPixmap, QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, \
     QGridLayout, QVBoxLayout, QHBoxLayout, QMenuBar, QStatusBar, QSizePolicy,QTextEdit
+
 from tools.common_helper import CommonHelper
 from tools.MyLabel import MyQLabel
+from windows.filterwindow import filterwindow
 
 '''
 QtWidgets.QWidget()感觉就是在哪个控件上生成一个QWidget，就是父控件和子控件
@@ -30,7 +32,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         #set logo and Window name
-        MainWindow.setWindowTitle("智能图象处理")
+        MainWindow.setWindowTitle("智能图像工坊")
         MainWindow.setWindowIcon(QIcon('./images/logo.png'))
         # 获取显示器分辨率
         self.desktop = QApplication.desktop()
@@ -159,7 +161,7 @@ class Ui_MainWindow(object):
         #滤镜label
         self.filterlabel = MyQLabel()
         self.filterlabel.setObjectName('filterlabel')
-        # label.connect_customized(self.fun)
+        self.filterlabel.connect_customized(lambda :self.clicknew(3))
         # 鼠标悬浮时变成手型
         self.filterlabel.setCursor(QCursor(Qt.PointingHandCursor))
         self.filterlabel.setStyleSheet(self.qssstyle)
@@ -218,6 +220,26 @@ class Ui_MainWindow(object):
         self.pm = QPixmap(self.lu)
         self.titlelabel.setPixmap(self.pm)
 
+    def clicknew(self,index):
+        if index==0:
+            pass
+        elif index==1:
+            pass
+        elif index==2:
+            pass
+        elif index==3:
+            self.fw = filterwindow()
+            self.fw.show()
+        elif index==4:
+            pass
+        elif index==5:
+            pass
+        elif index==6:
+            pass
+        elif index==7:
+            pass
+        else:
+            pass
 '''
 1.弄8套QLabel images  
 2.还是不要用for循环来实现了，直接实现8个不同的QLabel吧，虽然用循环实现会更妙一点，但是这是后期

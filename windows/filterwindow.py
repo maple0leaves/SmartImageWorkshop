@@ -1,9 +1,10 @@
 import  sys
 
-from PyQt5.QtGui import QCursor, QIcon
-from PyQt5.QtWidgets import  QWidget ,QGridLayout,QApplication
+from PyQt5.QtGui import QCursor, QIcon, QFont
+from PyQt5.QtWidgets import QWidget, QGridLayout, QApplication, QFrame
 from PyQt5.QtCore import Qt
 from tools.MyLabel import MyQLabel
+from windows.filterwidget import filterwidget
 
 
 class filterwindow(QWidget):
@@ -28,53 +29,59 @@ class filterwindow(QWidget):
         self.screenRect = self.desktop.screenGeometry()
         self.screenheight = self.screenRect.height()
         self.screenwidth = self.screenRect.width()
-        self.height = int(self.screenheight * 0.7)
-        self.width = int(self.screenwidth * 0.7)
+        self.height = int(self.screenheight * 0.6)
+        self.width = int(self.screenwidth * 0.2)
         # 设置大小
         self.resize(self.width, self.height)
-        self.setWindowTitle("智能图象处理")
-        self.setWindowIcon(QIcon('../images/logo.png'))
+        self.setWindowTitle("智能图像工坊")
+        self.setWindowIcon(QIcon('./images/logo.png'))
         self.setStyleSheet('QWidget{background-color:white;}')
-
+        self.font = QFont()
+        self.font.setPointSize(16)
         #word set center ,mouse touch label be hand
         self.bwLabel.setAlignment(Qt.AlignCenter)
+        self.bwLabel.setFont(self.font)
+        self.bwLabel.setFrameShape(QFrame.Box)
         self.bwLabel.setCursor(QCursor(Qt.PointingHandCursor))
-        self.bwLabel.setStyleSheet('MyQLabel{background-color:#f0f0f0;}')
-        self.cclabel.setAlignment(Qt.AlignCenter)
-        self.cclabel.setCursor(QCursor(Qt.PointingHandCursor))
-        self.delabel.setAlignment(Qt.AlignCenter)
-        self.delabel.setCursor(QCursor(Qt.PointingHandCursor))
-        self.cllabel.setAlignment(Qt.AlignCenter)
-        self.cllabel.setCursor(QCursor(Qt.PointingHandCursor))
+        self.bwLabel.setStyleSheet('MyQLabel:hover{background-color:#e5f3ff;}')
+        self.bwLabel.connect_customized(lambda:self.labelclick('黑白'))
 
-        self.grid.setColumnStretch(0,1)
-        self.grid.setColumnStretch(1,3)
-        self.grid.setColumnStretch(2,3)
-        self.grid.setColumnStretch(3,3)
+        self.cclabel.setAlignment(Qt.AlignCenter)
+        self.cclabel.setFont(self.font)
+        self.cclabel.setFrameShape(QFrame.Box)
+        self.cclabel.setCursor(QCursor(Qt.PointingHandCursor))
+        self.cclabel.setStyleSheet('MyQLabel:hover{background-color:#e5f3ff;}')
+        self.cclabel.connect_customized(lambda:self.labelclick('反色'))
+
+
+        self.delabel.setAlignment(Qt.AlignCenter)
+        self.delabel.setFont(self.font)
+        self.delabel.setFrameShape(QFrame.Box)
+        self.delabel.setCursor(QCursor(Qt.PointingHandCursor))
+        self.delabel.setStyleSheet('MyQLabel:hover{background-color:#e5f3ff;}')
+        self.delabel.connect_customized(lambda:self.labelclick('磨皮'))
+
+
+        self.cllabel.setAlignment(Qt.AlignCenter)
+        self.cllabel.setFont(self.font)
+        self.cllabel.setFrameShape(QFrame.Box)
+        self.cllabel.setCursor(QCursor(Qt.PointingHandCursor))
+        self.cllabel.setStyleSheet('MyQLabel:hover{background-color:#e5f3ff;}')
+        self.cllabel.connect_customized(lambda:self.labelclick('亮度'))
+
+
         self.grid.addWidget(self.bwLabel,0,0)
         self.grid.addWidget(self.cclabel,1,0)
         self.grid.addWidget(self.delabel,2,0)
         self.grid.addWidget(self.cllabel,3,0)
-        self.bwwidget()
-        # label = MyQLabel("saojioa")
-        # label2 = MyQLabel("saojioa")
-        # label.setAlignment(Qt.AlignCenter)
-        #
-        # self.grid.addWidget(label,4,1)
-        # self.grid.addWidget(label2,5,1)
 
         self.setLayout(self.grid)
+    def labelclick(self,name):
+        self.sw = filterwidget(name)
+        self.sw.show()
 
-    def bwwidget(self):
-        # layout row 4 ,column 6
-        self.wid = QWidget()
-        self.grid.addWidget(self.wid,0,1,6,3)
-        self.widgridlayout = QGridLayout()
-
-
-
-if __name__ =='__main__':
-    app = QApplication(sys.argv)
-    fw = filterwindow()
-    fw.show()
-    sys.exit(app.exec_())
+# if __name__ =='__main__':
+#     app = QApplication(sys.argv)
+#     fw = filterwindow()
+#     fw.show()
+#     sys.exit(app.exec_())

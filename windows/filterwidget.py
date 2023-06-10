@@ -1,7 +1,6 @@
 import  sys
-
 import cv2
-from PyQt5.QtGui import QCursor, QPixmap, QIcon, QImage
+from PyQt5.QtGui import QCursor, QPixmap, QIcon, QImage, QFont
 from PyQt5.QtWidgets import QWidget, QGridLayout, QApplication, QFrame, QFileDialog, QSlider, QVBoxLayout, QMessageBox
 from PyQt5.QtCore import Qt
 
@@ -11,24 +10,16 @@ from tools.MyLabel import MyQLabel
 
 
 '''maybe I set img size do not use label size but use Qwidget size ,Qwidget size is clearly'''
-def singleton(cls):
-    instances = {}
-    def wrapper(*args, **kwargs):
-        if cls not in instances:
-            instances[cls] = cls(*args, **kwargs)
-        return instances[cls]
 
-    return wrapper
 
-@singleton
-class singletonwidget(QWidget):
+class filterwidget(QWidget):
     '''
     this class use to process filter img
     '''
-    def __init__(self,name=''):
+    def __init__(self,name='黑白'):
         super().__init__()
-        self.setWindowTitle("智能图象处理")
-        self.setWindowIcon(QIcon('../images/logo.png'))
+        self.setWindowTitle("智能图像工坊")
+        self.setWindowIcon(QIcon('./images/logo.png'))
         self.setStyleSheet('QWidget{background-color:white;}')
         self.labelname = name
         #origin img
@@ -50,15 +41,19 @@ class singletonwidget(QWidget):
         # self.widget's layout
         self.gridlayout = QGridLayout()
         self.setLayout(self.gridlayout)
-
+        #字体大小
+        self.font = QFont()
+        self.font.setPointSize(16)
 
         self.originlabel = MyQLabel('原图')
+        self.originlabel.setFont(self.font)
         self.originlabel.setFrameShape(QFrame.Box)
         self.originlabel.setAlignment(Qt.AlignCenter)
         self.originlabel.setMinimumSize(int(self.width*0.5),int(self.height*0.9))
         self.originlabel.setMaximumSize(int(self.screenwidth*0.5),int(self.screenheight*0.9))
 
         self.newlabel = MyQLabel('新图片')
+        self.newlabel.setFont(self.font)
         self.newlabel.setAlignment(Qt.AlignCenter)
         self.newlabel.setFrameShape(QFrame.Box)
         self.newlabel.setMinimumSize(int(self.width*0.5),int(self.height*0.9))
@@ -66,6 +61,7 @@ class singletonwidget(QWidget):
         # put 3 Label layout
         self.gridlayout2 =QGridLayout()
         self.uplabel = MyQLabel('上传图片')
+        self.uplabel.setFont(self.font)
         self.uplabel.setStyleSheet('QLabel:hover{background-color:#e5f3ff}')
         self.uplabel.setMinimumSize(int(self.width*0.33),int(self.height*0.1))
         self.uplabel.setMaximumSize(int(self.screenwidth*0.33),int(self.screenheight*0.1))
@@ -94,6 +90,7 @@ class singletonwidget(QWidget):
         #set 黑白，反色，磨皮 label
         else:
             self.processlabel = MyQLabel('开始处理')
+            self.processlabel.setFont(self.font)
             self.processlabel.setStyleSheet('QLabel:hover{background-color:#e5f3ff}')
             self.processlabel.setFrameShape(QFrame.Box)
             self.processlabel.setCursor(QCursor(Qt.PointingHandCursor))
@@ -102,6 +99,7 @@ class singletonwidget(QWidget):
             self.processlabel.connect_customized(self.processimg)
 
         self.downloadlabel = MyQLabel('保存图片')
+        self.downloadlabel.setFont(self.font)
         self.downloadlabel.setStyleSheet('QLabel:hover{background-color:#e5f3ff}')
         self.downloadlabel.setMinimumSize(int(self.width * 0.33), int(self.height * 0.1))
         self.downloadlabel.setMaximumSize(int(self.screenwidth * 0.33), int(self.screenheight * 0.1))
@@ -189,8 +187,14 @@ class singletonwidget(QWidget):
         event.accept()
 
     def update_labels(self):
-        self.label_min.setText(str(self.slider.minimum()))
-        self.label_max.setText(str(self.slider.maximum()))
+        if self.pixmap is not None:
+            cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
+            modified_image = cv2.convertScaleAbs(cvimg, alpha=1, beta=self.slider.value())
+            q_image = ImgConverter.cvimg_to_qtimg(modified_image)
+            self.newimg = QPixmap.fromImage(q_image)
+            pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
+            self.newlabel.setPixmap(pixmap)
+
     def processimg(self):
         if self.pixmap is None:
             QMessageBox.information(self, '提示', '请先上传图片',
@@ -212,12 +216,24 @@ class singletonwidget(QWidget):
                 self.newlabel.setPixmap(pixmap)
 
             elif self.labelname=='反色':
-                pass
-            elif self.labelname=='磨皮':
-                pass
+                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
+                #opencv自带的反色函数
+                contray_img = cv2.bitwise_not(cvimg)
+                q_image = ImgConverter.cvimg_to_qtimg(contray_img)
+                self.newimg = QPixmap.fromImage(q_image)
+                pixmap = ImgAdapter.adapteSize(self.newimg,self.newlabel.width(),self.newlabel.height())
+                self.newlabel.setPixmap(pixmap)
 
-if __name__=='__main__':
-    app =QApplication(sys.argv)
-    stw= singletonwidget()
-    stw.show()
-    sys.exit(app.exec_())
+            elif self.labelname=='磨皮':
+                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
+                smoothed_image = cv2.bilateralFilter(cvimg, 5, 65, 65)
+                q_image = ImgConverter.cvimg_to_qtimg(smoothed_image)
+                self.newimg = QPixmap.fromImage(q_image)
+                pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
+                self.newlabel.setPixmap(pixmap)
+
+# if __name__=='__main__':
+#     app =QApplication(sys.argv)
+#     stw= filterwidget()
+#     stw.show()
+#     sys.exit(app.exec_())
