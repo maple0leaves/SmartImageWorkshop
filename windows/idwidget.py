@@ -12,7 +12,7 @@ from tools.MyLabel import MyQLabel
 '''maybe I set img size do not use label size but use Qwidget size ,Qwidget size is clearly'''
 
 
-class filterwidget(QWidget):
+class idwidget(QWidget):
     '''
     this class use to process filter img
     '''
@@ -73,7 +73,7 @@ class filterwidget(QWidget):
         if self.labelname=='亮度':
             self.label_min = MyQLabel('-50')
             self.label_max = MyQLabel('50')
-            self.label_max.setAlignment(Qt.AlignRight)
+            self.label_max.setAlignment(Qt.AlignCenter)
             self.slider = QSlider(Qt.Horizontal)
             self.slider.setMinimumSize(int(self.width * 0.33), int(self.height * 0.1))
             self.slider.setMaximumSize(int(self.screenwidth * 0.33), int(self.screenheight * 0.1))
@@ -81,6 +81,7 @@ class filterwidget(QWidget):
             self.slider.setTickPosition(QSlider.TicksBothSides)
             self.slider.setTickInterval(10)
             self.slider.setRange(-50, 50)
+
             self.sliderlayout = QGridLayout(self)
             self.sliderlayout.addWidget(self.slider,0,0,1,2)
             self.sliderlayout.addWidget(self.label_min,1,0,1,1)
@@ -230,8 +231,8 @@ class filterwidget(QWidget):
                 pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
                 self.newlabel.setPixmap(pixmap)
 
-# if __name__=='__main__':
-#     app =QApplication(sys.argv)
-#     stw= filterwidget()
-#     stw.show()
-#     sys.exit(app.exec_())
+if __name__=='__main__':
+    app =QApplication(sys.argv)
+    stw= idwidget()
+    stw.show()
+    sys.exit(app.exec_())

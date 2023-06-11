@@ -20,10 +20,15 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButto
 from tools.common_helper import CommonHelper
 from tools.MyLabel import MyQLabel
 from windows.filterwindow import filterwindow
+from windows.sketchwidget import sketchwidget
 
 '''
 QtWidgets.QWidget()感觉就是在哪个控件上生成一个QWidget，就是父控件和子控件
 '''
+
+
+
+
 class Ui_MainWindow(object):
     '''MainWindow->centralwidget->cwgridLayout-->1.titlelabel2.labelwidget
         ->gridLayout_2 in labelwidget->8label in gridLayout_2
@@ -69,7 +74,7 @@ class Ui_MainWindow(object):
         # self.titlelabel.connect_customized()
         self.timer1 = QTimer(MainWindow)
         self.timer1.timeout.connect(self.timer_TimeOut)
-        self.timer1.start(2000)  # 图片间隔时长
+        self.timer1.start(1500)  # 图片间隔时长
 
 
         #设置文字居中
@@ -172,7 +177,7 @@ class Ui_MainWindow(object):
         #素描label
         self.sketchlabel = MyQLabel()
         self.sketchlabel.setObjectName('sketchlabel')
-        # label.connect_customized(self.fun)
+        self.sketchlabel.connect_customized(lambda :self.clicknew(4))
         # 鼠标悬浮时变成手型
         self.sketchlabel.setCursor(QCursor(Qt.PointingHandCursor))
         self.sketchlabel.setStyleSheet(self.qssstyle)
@@ -231,7 +236,8 @@ class Ui_MainWindow(object):
             self.fw = filterwindow()
             self.fw.show()
         elif index==4:
-            pass
+            self.sw = sketchwidget()
+            self.sw.show()
         elif index==5:
             pass
         elif index==6:

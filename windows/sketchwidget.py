@@ -12,7 +12,7 @@ from tools.MyLabel import MyQLabel
 '''maybe I set img size do not use label size but use Qwidget size ,Qwidget size is clearly'''
 
 
-class filterwidget(QWidget):
+class sketchwidget(QWidget):
     '''
     this class use to process filter img
     '''
@@ -69,34 +69,29 @@ class filterwidget(QWidget):
         self.uplabel.setCursor(QCursor(Qt.PointingHandCursor))
         self.uplabel.setAlignment(Qt.AlignCenter)
 
-        #set 亮度的 Qslider
-        if self.labelname=='亮度':
-            self.label_min = MyQLabel('-50')
-            self.label_max = MyQLabel('50')
-            self.label_max.setAlignment(Qt.AlignRight)
-            self.slider = QSlider(Qt.Horizontal)
-            self.slider.setMinimumSize(int(self.width * 0.33), int(self.height * 0.1))
-            self.slider.setMaximumSize(int(self.screenwidth * 0.33), int(self.screenheight * 0.1))
-            self.slider.setOrientation(Qt.Horizontal)
-            self.slider.setTickPosition(QSlider.TicksBothSides)
-            self.slider.setTickInterval(10)
-            self.slider.setRange(-50, 50)
-            self.sliderlayout = QGridLayout(self)
-            self.sliderlayout.addWidget(self.slider,0,0,1,2)
-            self.sliderlayout.addWidget(self.label_min,1,0,1,1)
-            self.sliderlayout.addWidget(self.label_max,1,1,1,1)
-            #when slider valueChanged ,connect elf.update_labels
-            self.slider.valueChanged.connect(self.update_labels)
-        #set 黑白，反色，磨皮 label
-        else:
-            self.processlabel = MyQLabel('开始处理')
-            self.processlabel.setFont(self.font)
-            self.processlabel.setStyleSheet('QLabel:hover{background-color:#e5f3ff}')
-            self.processlabel.setFrameShape(QFrame.Box)
-            self.processlabel.setCursor(QCursor(Qt.PointingHandCursor))
-            self.processlabel.setAlignment(Qt.AlignCenter)
-            #when click processlabel run self.processimg to process img
-            self.processlabel.connect_customized(self.processimg)
+        #set 素描程度 Qslider
+        self.label_min = MyQLabel('0')
+        self.label_max = MyQLabel('100')
+        self.label_max.setAlignment(Qt.AlignRight)
+
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setSingleStep(2)  # 设置每次滑动的步长为2
+        self.slider.setMinimumSize(int(self.width * 0.33), int(self.height * 0.1))
+        self.slider.setMaximumSize(int(self.screenwidth * 0.33), int(self.screenheight * 0.1))
+        #设置刻度显示位置
+        self.slider.setTickPosition(QSlider.TicksBothSides)
+        #设置刻度显示间隔
+        self.slider.setTickInterval(10)
+        #设置滑块范围
+        self.slider.setRange(0, 100)
+
+        self.sliderlayout = QGridLayout(self)
+        self.sliderlayout.addWidget(self.slider,0,0,1,2)
+        self.sliderlayout.addWidget(self.label_min,1,0,1,1)
+        self.sliderlayout.addWidget(self.label_max,1,1,1,1)
+        #when slider valueChanged ,connect elf.update_labels
+        self.slider.valueChanged.connect(self.update_labels)
+
 
         self.downloadlabel = MyQLabel('保存图片')
         self.downloadlabel.setFont(self.font)
@@ -120,17 +115,13 @@ class filterwidget(QWidget):
         self.gridlayout.addLayout(self.gridlayout2,1,0,1,2)
 
         self.gridlayout2.addWidget(self.uplabel,0,0,1,1)
-        if self.labelname=='亮度':
-            self.gridlayout2.addLayout(self.sliderlayout, 0, 1, 1, 1)
-        else:
-            self.gridlayout2.addWidget(self.processlabel,0,1,1,1)
+        self.gridlayout2.addLayout(self.sliderlayout, 0, 1, 1, 1)
         self.gridlayout2.addWidget(self.downloadlabel,0,2,1,1)
 
         self.uplabel.connect_customized(self.open_image)
         self.downloadlabel.connect_customized(self.save_image)
 
     def open_image(self):
-
         if self.isMaximized():
             oheight = self.screenheight * 0.9
             owidth = self.screenwidth * 0.49
@@ -188,50 +179,21 @@ class filterwidget(QWidget):
 
     def update_labels(self):
         if self.pixmap is not None:
+            #除去偶数卷积核情况
+            value = self.slider.value() if self.slider.value()%2==1 else self.slider.value()+1
             cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
-            modified_image = cv2.convertScaleAbs(cvimg, alpha=1, beta=self.slider.value())
-            q_image = ImgConverter.cvimg_to_qtimg(modified_image)
+            print(value)
+            img_gray = cv2.cvtColor(cvimg, cv2.COLOR_RGB2GRAY)
+            img_blur = cv2.GaussianBlur(img_gray, ksize=(value, value), sigmaX=0, sigmaY=0)
+            img_out = cv2.divide(img_gray, img_blur, scale=255)
+            q_image = ImgConverter.graycvimg_to_qtimg(img_out)
             self.newimg = QPixmap.fromImage(q_image)
             pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
             self.newlabel.setPixmap(pixmap)
 
-    def processimg(self):
-        if self.pixmap is None:
-            QMessageBox.information(self, '提示', '请先上传图片',
-                                    QMessageBox.Yes )
-        else:
-            if self.labelname=='黑白':
-                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
-                img_gray = cv2.cvtColor(cvimg, cv2.COLOR_RGB2GRAY)
-                q_image = ImgConverter.graycvimg_to_qtimg(img_gray)
-                # 将灰度图像转换为QPixmap
-                self.newimg = QPixmap.fromImage(q_image)
-                # print("self.origin",self.pixmap.width(),self.pixmap.height())
-                # print("self.newimg",self.newimg.width(),self.newimg.height())
-                # print("self.originlabel",self.originlabel.width(),self.originlabel.height())
-                # print("self.newlabel",self.newlabel.width(),self.newlabel.height())
-                pixmap = ImgAdapter.adapteSize(self.newimg,self.newlabel.width(),self.newlabel.height())
-                self.newlabel.setPixmap(pixmap)
 
-            elif self.labelname=='反色':
-                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
-                #opencv自带的反色函数
-                contray_img = cv2.bitwise_not(cvimg)
-                q_image = ImgConverter.cvimg_to_qtimg(contray_img)
-                self.newimg = QPixmap.fromImage(q_image)
-                pixmap = ImgAdapter.adapteSize(self.newimg,self.newlabel.width(),self.newlabel.height())
-                self.newlabel.setPixmap(pixmap)
-
-            elif self.labelname=='磨皮':
-                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
-                smoothed_image = cv2.bilateralFilter(cvimg, 5, 65, 65)
-                q_image = ImgConverter.cvimg_to_qtimg(smoothed_image)
-                self.newimg = QPixmap.fromImage(q_image)
-                pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
-                self.newlabel.setPixmap(pixmap)
-
-# if __name__=='__main__':
-#     app =QApplication(sys.argv)
-#     stw= filterwidget()
-#     stw.show()
-#     sys.exit(app.exec_())
+if __name__=='__main__':
+    app =QApplication(sys.argv)
+    stw= sketchwidget()
+    stw.show()
+    sys.exit(app.exec_())

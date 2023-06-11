@@ -50,6 +50,12 @@ class ImgConverter:
         cvimg = QImage(cvimg.data, width, height, width * depth, QImage.Format_RGB888)
 
         return cvimg
+    @staticmethod
+    def graycvimg_to_qtimg(img_gray):
+        height, width = img_gray.shape
+        bytes_per_line = width
+        q_image = QImage(img_gray.data, width, height, bytes_per_line, QImage.Format_Grayscale8)
 
+        return q_image
 
 
