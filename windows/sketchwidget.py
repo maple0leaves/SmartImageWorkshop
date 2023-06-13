@@ -16,12 +16,11 @@ class sketchwidget(QWidget):
     '''
     this class use to process filter img
     '''
-    def __init__(self,name='黑白'):
+    def __init__(self):
         super().__init__()
         self.setWindowTitle("智能图像工坊")
         self.setWindowIcon(QIcon('./images/logo.png'))
         self.setStyleSheet('QWidget{background-color:white;}')
-        self.labelname = name
         #origin img
         self.pixmap=None
         #new img

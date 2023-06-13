@@ -16,7 +16,7 @@ class filterwidget(QWidget):
     '''
     this class use to process filter img
     '''
-    def __init__(self,name='黑白'):
+    def __init__(self,name='磨皮'):
         super().__init__()
         self.setWindowTitle("智能图像工坊")
         self.setWindowIcon(QIcon('./images/logo.png'))
@@ -87,7 +87,25 @@ class filterwidget(QWidget):
             self.sliderlayout.addWidget(self.label_max,1,1,1,1)
             #when slider valueChanged ,connect elf.update_labels
             self.slider.valueChanged.connect(self.update_labels)
-        #set 黑白，反色，磨皮 label
+
+        elif self.labelname=='磨皮':
+            self.label_min = MyQLabel('0')
+            self.label_max = MyQLabel('9')
+            self.label_max.setAlignment(Qt.AlignRight)
+            self.slider = QSlider(Qt.Horizontal)
+            self.slider.setMinimumSize(int(self.width * 0.33), int(self.height * 0.1))
+            self.slider.setMaximumSize(int(self.screenwidth * 0.33), int(self.screenheight * 0.1))
+            self.slider.setOrientation(Qt.Horizontal)
+            self.slider.setTickPosition(QSlider.TicksBothSides)
+            self.slider.setTickInterval(10)
+            self.slider.setRange(1, 10)
+            self.sliderlayout = QGridLayout(self)
+            self.sliderlayout.addWidget(self.slider,0,0,1,2)
+            self.sliderlayout.addWidget(self.label_min,1,0,1,1)
+            self.sliderlayout.addWidget(self.label_max,1,1,1,1)
+            #when slider valueChanged ,connect elf.update_labels
+            self.slider.valueChanged.connect(self.update_labels)
+        #set 黑白，反色 label
         else:
             self.processlabel = MyQLabel('开始处理')
             self.processlabel.setFont(self.font)
@@ -121,6 +139,8 @@ class filterwidget(QWidget):
 
         self.gridlayout2.addWidget(self.uplabel,0,0,1,1)
         if self.labelname=='亮度':
+            self.gridlayout2.addLayout(self.sliderlayout, 0, 1, 1, 1)
+        elif self.labelname=='磨皮':
             self.gridlayout2.addLayout(self.sliderlayout, 0, 1, 1, 1)
         else:
             self.gridlayout2.addWidget(self.processlabel,0,1,1,1)
@@ -188,12 +208,22 @@ class filterwidget(QWidget):
 
     def update_labels(self):
         if self.pixmap is not None:
-            cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
-            modified_image = cv2.convertScaleAbs(cvimg, alpha=1, beta=self.slider.value())
-            q_image = ImgConverter.cvimg_to_qtimg(modified_image)
-            self.newimg = QPixmap.fromImage(q_image)
-            pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
-            self.newlabel.setPixmap(pixmap)
+            if self.labelname=='磨皮':
+                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
+                smoothed_image = cv2.bilateralFilter(cvimg, self.slider.value(), 65, 65)
+                q_image = ImgConverter.cvimg_to_qtimg(smoothed_image)
+                self.newimg = QPixmap.fromImage(q_image)
+                pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
+                self.newlabel.setPixmap(pixmap)
+
+            elif self.labelname=='亮度':
+                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
+                modified_image = cv2.convertScaleAbs(cvimg, alpha=1, beta=self.slider.value())
+                q_image = ImgConverter.cvimg_to_qtimg(modified_image)
+                self.newimg = QPixmap.fromImage(q_image)
+                pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
+                self.newlabel.setPixmap(pixmap)
+
 
     def processimg(self):
         if self.pixmap is None:
@@ -222,16 +252,9 @@ class filterwidget(QWidget):
                 pixmap = ImgAdapter.adapteSize(self.newimg,self.newlabel.width(),self.newlabel.height())
                 self.newlabel.setPixmap(pixmap)
 
-            elif self.labelname=='磨皮':
-                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
-                smoothed_image = cv2.bilateralFilter(cvimg, 5, 65, 65)
-                q_image = ImgConverter.cvimg_to_qtimg(smoothed_image)
-                self.newimg = QPixmap.fromImage(q_image)
-                pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
-                self.newlabel.setPixmap(pixmap)
 
-# if __name__=='__main__':
-#     app =QApplication(sys.argv)
-#     stw= filterwidget()
-#     stw.show()
-#     sys.exit(app.exec_())
+if __name__=='__main__':
+    app =QApplication(sys.argv)
+    stw= filterwidget()
+    stw.show()
+    sys.exit(app.exec_())

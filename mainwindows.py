@@ -20,6 +20,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButto
 from tools.common_helper import CommonHelper
 from tools.MyLabel import MyQLabel
 from windows.filterwindow import filterwindow
+from windows.idwidget import idwidget
+from windows.morewidget import morewidget
+from windows.mosaicwidget import mosaicwidget
 from windows.sketchwidget import sketchwidget
 
 '''
@@ -188,7 +191,7 @@ class Ui_MainWindow(object):
         #马赛克label
         self.mosaiclabel = MyQLabel()
         self.mosaiclabel.setObjectName('mosaiclabel')
-        # label.connect_customized(self.fun)
+        self.mosaiclabel.connect_customized(lambda :self.clicknew(5))
         # 鼠标悬浮时变成手型
         self.mosaiclabel.setCursor(QCursor(Qt.PointingHandCursor))
         self.mosaiclabel.setStyleSheet(self.qssstyle)
@@ -199,7 +202,7 @@ class Ui_MainWindow(object):
         #证件照换底label
         self.idlabel = MyQLabel()
         self.idlabel.setObjectName('idlabel')
-        # label.connect_customized(self.fun)
+        self.idlabel.connect_customized(lambda :self.clicknew(6))
         # 鼠标悬浮时变成手型
         self.idlabel.setCursor(QCursor(Qt.PointingHandCursor))
         self.idlabel.setStyleSheet(self.qssstyle)
@@ -210,7 +213,7 @@ class Ui_MainWindow(object):
         #更多label
         self.morelabel = MyQLabel()
         self.morelabel.setObjectName('morelabel')
-        # label.connect_customized(self.fun)
+        self.morelabel.connect_customized(lambda :self.clicknew(7))
         # 鼠标悬浮时变成手型
         self.morelabel.setCursor(QCursor(Qt.PointingHandCursor))
         self.morelabel.setStyleSheet(self.qssstyle)
@@ -239,11 +242,14 @@ class Ui_MainWindow(object):
             self.sw = sketchwidget()
             self.sw.show()
         elif index==5:
-            pass
+            self.mw = mosaicwidget()
+            self.mw.show()
         elif index==6:
-            pass
+            self.iw= idwidget()
+            self.iw.show()
         elif index==7:
-            pass
+            self.mow = morewidget()
+            self.mow.show()
         else:
             pass
 '''

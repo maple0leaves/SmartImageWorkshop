@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt
 from tools.ImgAdapter import ImgAdapter
 from tools.ImgConverter import ImgConverter
 from tools.MyLabel import MyQLabel
-
+from MODnet.start import run
 
 '''maybe I set img size do not use label size but use Qwidget size ,Qwidget size is clearly'''
 
@@ -24,6 +24,8 @@ class idwidget(QWidget):
         self.setStyleSheet('QWidget{background-color:white;}')
         #origin img
         self.pixmap=None
+        #origin path
+        self.filename =None
         #new img
         self.newimg = None
 
@@ -147,6 +149,7 @@ class idwidget(QWidget):
 
         filename, _ = QFileDialog.getOpenFileName(None, "Open Image", ".", "Images (*.png *.jpg *.bmp)")
         if filename:
+            self.filename = filename
             self.pixmap = QPixmap(filename)
             pixmap=ImgAdapter.adapteSize(self.pixmap,owidth,oheight)
             self.originlabel.setPixmap(pixmap)
@@ -198,7 +201,9 @@ class idwidget(QWidget):
                                     QMessageBox.Yes )
         else:
             if index==1:
+                run('./inputimage/img_1.png', 'img_2.png', 'out.jpg')
                 cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
+
                 img = self.changebackground(cvimg,(0, 0, 255))
                 q_image = ImgConverter.cvimg_to_qtimg(img)
                 self.newimg = QPixmap.fromImage(q_image)

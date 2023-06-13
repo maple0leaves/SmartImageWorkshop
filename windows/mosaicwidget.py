@@ -1,6 +1,5 @@
 import  sys
 import cv2
-import numpy as np
 from PyQt5.QtGui import QCursor, QPixmap, QIcon, QImage, QFont
 from PyQt5.QtWidgets import QWidget, QGridLayout, QApplication, QFrame, QFileDialog, QSlider, QVBoxLayout, QMessageBox
 from PyQt5.QtCore import Qt
@@ -13,7 +12,7 @@ from tools.MyLabel import MyQLabel
 '''maybe I set img size do not use label size but use Qwidget size ,Qwidget size is clearly'''
 
 
-class idwidget(QWidget):
+class mosaicwidget(QWidget):
     '''
     this class use to process filter img
     '''
@@ -70,39 +69,14 @@ class idwidget(QWidget):
         self.uplabel.setAlignment(Qt.AlignCenter)
 
 
-        self.label_red = MyQLabel('红色背景')
-        self.label_red.setFont(self.font)
-        self.label_red.setStyleSheet('QLabel:hover{background-color:#e5f3ff}')
-        self.label_red.setFrameShape(QFrame.Box)
-        self.label_red.setCursor(QCursor(Qt.PointingHandCursor))
-        self.label_red.setAlignment(Qt.AlignCenter)
-        self.label_red.connect_customized(lambda :self.processimg(1))
-
-        self.label_blue = MyQLabel('蓝色背景')
-        self.label_blue.setFont(self.font)
-        self.label_blue.setStyleSheet('QLabel:hover{background-color:#e5f3ff}')
-        self.label_blue.setFrameShape(QFrame.Box)
-        self.label_blue.setCursor(QCursor(Qt.PointingHandCursor))
-        self.label_blue.setAlignment(Qt.AlignCenter)
-        self.label_blue.connect_customized(lambda :self.processimg(2))
-
-        self.label_white = MyQLabel('白色背景')
-        self.label_white.setFont(self.font)
-        self.label_white.setStyleSheet('QLabel:hover{background-color:#e5f3ff}')
-        self.label_white.setFrameShape(QFrame.Box)
-        self.label_white.setCursor(QCursor(Qt.PointingHandCursor))
-        self.label_white.setAlignment(Qt.AlignCenter)
-        self.label_white.connect_customized(lambda :self.processimg(3))
-
-
-        self.sliderlayout = QGridLayout(self)
-        # self.sliderlayout.setMinimumSize(int(self.width * 0.33), int(self.height * 0.1))
-        # self.sliderlayout.setMaximumSize(int(self.screenwidth * 0.33), int(self.screenheight * 0.1))
-        self.sliderlayout.addWidget(self.label_red,0,0,1,1)
-        self.sliderlayout.addWidget(self.label_blue,0,1,1,1)
-        self.sliderlayout.addWidget(self.label_white,0,2,1,1)
-        #when slider valueChanged ,connect elf.update_labels
-
+        self.processlabel = MyQLabel('开始处理')
+        self.processlabel.setFont(self.font)
+        self.processlabel.setStyleSheet('QLabel:hover{background-color:#e5f3ff}')
+        self.processlabel.setFrameShape(QFrame.Box)
+        self.processlabel.setCursor(QCursor(Qt.PointingHandCursor))
+        self.processlabel.setAlignment(Qt.AlignCenter)
+        #when click processlabel run self.processimg to process img
+        self.processlabel.connect_customized(self.processimg)
 
         self.downloadlabel = MyQLabel('保存图片')
         self.downloadlabel.setFont(self.font)
@@ -126,8 +100,8 @@ class idwidget(QWidget):
         self.gridlayout.addLayout(self.gridlayout2,1,0,1,2)
 
         self.gridlayout2.addWidget(self.uplabel,0,0,1,1)
-        self.gridlayout2.addLayout(self.sliderlayout, 0, 1, 1, 1)
 
+        self.gridlayout2.addWidget(self.processlabel,0,1,1,1)
         self.gridlayout2.addWidget(self.downloadlabel,0,2,1,1)
 
         self.uplabel.connect_customized(self.open_image)
@@ -191,62 +165,49 @@ class idwidget(QWidget):
         event.accept()
 
 
-
-    def processimg(self,index):
+    def processimg(self):
         if self.pixmap is None:
             QMessageBox.information(self, '提示', '请先上传图片',
                                     QMessageBox.Yes )
         else:
-            if index==1:
-                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
-                img = self.changebackground(cvimg,(0, 0, 255))
-                q_image = ImgConverter.cvimg_to_qtimg(img)
-                self.newimg = QPixmap.fromImage(q_image)
-                pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
-                self.newlabel.setPixmap(pixmap)
-            elif index==2:
-                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
-                img = self.changebackground(cvimg,(243, 191, 0))
-                q_image = ImgConverter.cvimg_to_qtimg(img)
-                self.newimg = QPixmap.fromImage(q_image)
-                pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
-                self.newlabel.setPixmap(pixmap)
-            elif index==3:
-                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
-                img = self.changebackground(cvimg,(255, 255, 255))
-                q_image = ImgConverter.cvimg_to_qtimg(img)
-                self.newimg = QPixmap.fromImage(q_image)
-                pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
-                self.newlabel.setPixmap(pixmap)
+            cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
+            mosaic_image = self.apply_mosaic(cvimg, block_size=20)
+            q_image = ImgConverter.cvimg_to_qtimg(mosaic_image)
+            self.newimg = QPixmap.fromImage(q_image)
+            pixmap = ImgAdapter.adapteSize(self.newimg,self.newlabel.width(),self.newlabel.height())
+            self.newlabel.setPixmap(pixmap)
 
-    def changebackground(self,img, color):
-        new_img = cv2.resize(img, None, fx=0.5, fy=0.5)
-        rows, cols, channels = new_img.shape
+    def apply_mosaic(self,image, block_size):
+        # 获取图像的宽度和高度
+        height, width, _ = image.shape
 
-        # 将图片转换为灰度图片
-        gray_img = cv2.cvtColor(new_img, cv2.COLOR_BGR2HSV)
+        # 计算图像中每个块的数量
+        num_blocks_x = width // block_size
+        num_blocks_y = height // block_size
 
-        # 图片二值化处理
-        low_value = np.array([90, 70, 70])
-        high_value = np.array([110, 255, 255])
-        binary_img = cv2.inRange(gray_img, low_value, high_value)
+        # 对每个块进行马赛克处理
+        for i in range(num_blocks_y):
+            for j in range(num_blocks_x):
+                # 获取当前块的起始和结束位置
+                x_start = j * block_size
+                y_start = i * block_size
+                x_end = x_start + block_size
+                y_end = y_start + block_size
 
-        # 腐蚀膨胀
-        erode = cv2.erode(binary_img, None, iterations=1)
-        dilate = cv2.dilate(erode, None, iterations=1)
-        # cv2.imshow('dilate', dilate)
+                # 获取当前块的图像数据
+                block = image[y_start:y_end, x_start:x_end]
 
-        # 遍历替换
-        for i in range(rows):
-            for j in range(cols):
-                if dilate[i, j] == 255:
-                    # 此处替换颜色，为BGR通道
-                    new_img[i, j] = color  # (0, 0, 255)替换为红底   (255, 255, 255)替换为白底
+                # 计算当前块的平均像素值
+                avg_color = block.mean(axis=(0, 1)).astype(int)
 
-        return new_img
+                # 将当前块的像素值设为平均像素值
+                image[y_start:y_end, x_start:x_end] = avg_color
+
+        return image
+
 
 if __name__=='__main__':
     app =QApplication(sys.argv)
-    stw= idwidget()
+    stw= filterwidget()
     stw.show()
     sys.exit(app.exec_())
