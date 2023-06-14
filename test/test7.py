@@ -30,7 +30,7 @@ def apply_mosaic(image, block_size):
 
 if __name__ == '__main__':
     # 读取图像
-    image = cv2.imread('img.png')
+    image = cv2.imread('white.png')
     mosaic_image =image.copy()
     # 应用马赛克效果
     mosaic_image = apply_mosaic(mosaic_image, block_size=20)

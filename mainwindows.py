@@ -19,8 +19,11 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButto
 
 from tools.common_helper import CommonHelper
 from tools.MyLabel import MyQLabel
+from windows.adaptwidget import adaptwidget
+from windows.animewidget import animewidget
 from windows.filterwindow import filterwindow
 from windows.idwidget import idwidget
+from windows.mattingwidget import mattingwidget
 from windows.morewidget import morewidget
 from windows.mosaicwidget import mosaicwidget
 from windows.sketchwidget import sketchwidget
@@ -136,7 +139,7 @@ class Ui_MainWindow(object):
         #智能人像抠图label
         self.mattingLabel = MyQLabel()
         self.mattingLabel.setObjectName('mattinglabel')
-        # label.connect_customized(self.fun)
+        self.mattingLabel.connect_customized(lambda :self.clicknew(0))
         # 鼠标悬浮时变成手型
         self.mattingLabel.setCursor(QCursor(Qt.PointingHandCursor))
         self.mattingLabel.setStyleSheet(self.qssstyle)
@@ -147,7 +150,7 @@ class Ui_MainWindow(object):
         #智能动漫风格label
         self.animelabel = MyQLabel()
         self.animelabel.setObjectName('animelabel')
-        # label.connect_customized(self.fun)
+        self.animelabel.connect_customized(lambda :self.clicknew(1))
         # 鼠标悬浮时变成手型
         self.animelabel.setCursor(QCursor(Qt.PointingHandCursor))
         self.animelabel.setStyleSheet(self.qssstyle)
@@ -155,16 +158,16 @@ class Ui_MainWindow(object):
         self.animelabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.gridLayout_2.addWidget(self.animelabel, 0, 1, 1, 1)
 
-        #智能画质提升label
-        self.imguplabel = MyQLabel()
-        self.imguplabel.setObjectName('imguplabel')
-        # label.connect_customized(self.fun)
+        #图像微调label
+        self.adaptlabel = MyQLabel()
+        self.adaptlabel.setObjectName('adaptlabel')
+        self.adaptlabel.connect_customized(lambda :self.clicknew(2))
         # 鼠标悬浮时变成手型
-        self.imguplabel.setCursor(QCursor(Qt.PointingHandCursor))
-        self.imguplabel.setStyleSheet(self.qssstyle)
+        self.adaptlabel.setCursor(QCursor(Qt.PointingHandCursor))
+        self.adaptlabel.setStyleSheet(self.qssstyle)
         # 设置label随着布局大小变化
-        self.imguplabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.gridLayout_2.addWidget(self.imguplabel, 0, 2, 1, 1)
+        self.adaptlabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.gridLayout_2.addWidget(self.adaptlabel, 0, 2, 1, 1)
 
         #滤镜label
         self.filterlabel = MyQLabel()
@@ -230,11 +233,14 @@ class Ui_MainWindow(object):
 
     def clicknew(self,index):
         if index==0:
-            pass
+            self.maw = mattingwidget()
+            self.maw.show()
         elif index==1:
-            pass
+            self.aw = animewidget()
+            self.aw.show()
         elif index==2:
-            pass
+            self.adw = adaptwidget()
+            self.adw.show()
         elif index==3:
             self.fw = filterwindow()
             self.fw.show()

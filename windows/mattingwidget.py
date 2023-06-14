@@ -13,7 +13,7 @@ from MODnet.start import run
 '''maybe I set img size do not use label size but use Qwidget size ,Qwidget size is clearly'''
 
 
-class idwidget(QWidget):
+class mattingwidget(QWidget):
     '''
     this class use to process filter img
     '''
@@ -72,7 +72,7 @@ class idwidget(QWidget):
         self.uplabel.setAlignment(Qt.AlignCenter)
 
 
-        self.label_red = MyQLabel('红色背景')
+        self.label_red = MyQLabel('白色背景')
         self.label_red.setFont(self.font)
         self.label_red.setStyleSheet('QLabel:hover{background-color:#e5f3ff}')
         self.label_red.setFrameShape(QFrame.Box)
@@ -80,7 +80,7 @@ class idwidget(QWidget):
         self.label_red.setAlignment(Qt.AlignCenter)
         self.label_red.connect_customized(lambda :self.processimg(1))
 
-        self.label_blue = MyQLabel('蓝色背景')
+        self.label_blue = MyQLabel('绿色背景')
         self.label_blue.setFont(self.font)
         self.label_blue.setStyleSheet('QLabel:hover{background-color:#e5f3ff}')
         self.label_blue.setFrameShape(QFrame.Box)
@@ -88,7 +88,7 @@ class idwidget(QWidget):
         self.label_blue.setAlignment(Qt.AlignCenter)
         self.label_blue.connect_customized(lambda :self.processimg(2))
 
-        self.label_white = MyQLabel('白色背景')
+        self.label_white = MyQLabel('自定义背景')
         self.label_white.setFont(self.font)
         self.label_white.setStyleSheet('QLabel:hover{background-color:#e5f3ff}')
         self.label_white.setFrameShape(QFrame.Box)
@@ -201,28 +201,28 @@ class idwidget(QWidget):
                                     QMessageBox.Yes )
         else:
             if index==1:
-                run('./inputimage/img_1.png', 'img_2.png', 'out.jpg')
-                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
-
-                img = self.changebackground(cvimg,(0, 0, 255))
+                img = run(self.filename, './images/white.png')
+                img = cv2.cvtColor(img,cv2.COLOR_RGB2BGR)
                 q_image = ImgConverter.cvimg_to_qtimg(img)
                 self.newimg = QPixmap.fromImage(q_image)
                 pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
                 self.newlabel.setPixmap(pixmap)
             elif index==2:
-                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
-                img = self.changebackground(cvimg,(243, 191, 0))
+                img = run(self.filename, './images/green.png')
+                img = cv2.cvtColor(img,cv2.COLOR_RGB2BGR)
                 q_image = ImgConverter.cvimg_to_qtimg(img)
                 self.newimg = QPixmap.fromImage(q_image)
                 pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
                 self.newlabel.setPixmap(pixmap)
             elif index==3:
-                cvimg = ImgConverter.qpixmap_to_cvimg(self.pixmap)
-                img = self.changebackground(cvimg,(255, 255, 255))
-                q_image = ImgConverter.cvimg_to_qtimg(img)
-                self.newimg = QPixmap.fromImage(q_image)
-                pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
-                self.newlabel.setPixmap(pixmap)
+                filename, _ = QFileDialog.getOpenFileName(None, "Open Image", ".", "Images (*.png *.jpg *.bmp)")
+                if filename:
+                    img = run(self.filename, filename)
+                    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+                    q_image = ImgConverter.cvimg_to_qtimg(img)
+                    self.newimg = QPixmap.fromImage(q_image)
+                    pixmap = ImgAdapter.adapteSize(self.newimg, self.newlabel.width(), self.newlabel.height())
+                    self.newlabel.setPixmap(pixmap)
 
     def changebackground(self,img, color):
         new_img = cv2.resize(img, None, fx=0.5, fy=0.5)

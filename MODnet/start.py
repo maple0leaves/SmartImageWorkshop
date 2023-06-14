@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.transforms as transforms
 
-from models.modnet import MODNet
+from MODnet.models.modnet import MODNet
 
 
 def combine(image, matte, bg):
@@ -87,7 +87,7 @@ def get_image_tensor(_image, _ref_size, _im_transform):
     return _im, _im_h, _im_w
 
 
-def run(input_image, background_image, output_image):
+def run(input_image, background_image,output_path='.'):
     # define hyper-parameters
     ref_size = 512
 
@@ -102,15 +102,15 @@ def run(input_image, background_image, output_image):
     modnet = MODNet(backbone_pretrained=False)
     modnet = nn.DataParallel(modnet)
 
-    model_path = "modnet_photographic_portrait_matting.ckpt"
-    input_dir = "./inputimage/"
-    background_dir = "."
-    output_dir = "."
+    model_path = "./MODnet/modnet_photographic_portrait_matting.ckpt"
+    # input_dir = "./inputimage/"
+    # background_dir = "."
+    # output_dir = "."
 
     # input_path = os.path.join(input_dir, input_image)
     input_path = input_image
     # output_path = os.path.join(output_dir, output_image)
-    output_path = output_image
+    # output_path = output_image
     background_path = background_image
     # if not isinstance(background_image, tuple):
     #     background_path = os.path.join(background_dir, background_image)
@@ -141,8 +141,8 @@ def run(input_image, background_image, output_image):
     bg = get_bg(background_path, np.asarray(im).shape)
     foreground = combine(im, matte, bg)
 
-    Image.fryomarray(np.uint8(foreground)).save(output_path)
-
+    # Image.fryomarray(np.uint8(foreground)).save(output_path)
+    return np.uint8(foreground)
 
 if __name__ == '__main__':
     # input_image_file = "img_1.png"

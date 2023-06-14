@@ -16,13 +16,13 @@ MyQLabel#animelabel:hover{
     border-image:url(./images/anime2.png)
 }
 
-MyQLabel#imguplabel
+MyQLabel#adaptlabel
 {
-    border-image:url(./images/imgup1.png);
+    border-image:url(./images/adapt1.png);
     border-radius: 20px;
 }
-MyQLabel#imguplabel:hover{
-    border-image:url(./images/imgup2.png)
+MyQLabel#adaptlabel:hover{
+    border-image:url(./images/adapt2.png)
 }
 
 MyQLabel#filterlabel
