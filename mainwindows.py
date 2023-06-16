@@ -225,7 +225,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.morelabel, 1, 3, 1, 1)
     def timer_TimeOut(self):
         self.n += 1
-        if self.n > 3:
+        if self.n > 5:
             self.n = 1
         self.lu = "./images/img" + str(self.n) + ".png"
         self.pm = QPixmap(self.lu)
