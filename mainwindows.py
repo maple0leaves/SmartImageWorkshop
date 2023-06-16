@@ -80,7 +80,7 @@ class Ui_MainWindow(object):
         # self.titlelabel.connect_customized()
         self.timer1 = QTimer(MainWindow)
         self.timer1.timeout.connect(self.timer_TimeOut)
-        self.timer1.start(1500)  # 图片间隔时长
+        self.timer1.start(2000)  # 图片间隔时长
 
 
         #设置文字居中
