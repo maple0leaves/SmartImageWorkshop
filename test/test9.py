@@ -15,7 +15,7 @@ class Example(QWidget):
         layout.addWidget(label)
 
         # 创建 QMovie 对象并加载 GIF 图片
-        movie = QMovie('../1.gif')
+        movie = QMovie('../testimgs/1.gif')
         label.setMovie(movie)
 
         # 设置 QMovie 循环播放

@@ -6,7 +6,7 @@ import sys
 class AnimatedWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.movie = QMovie('../1.gif')
+        self.movie = QMovie('../testimgs/1.gif')
         self.movie.frameChanged.connect(self.update)  # 连接帧变化信号到 update 方法
         self.movie.start()
 

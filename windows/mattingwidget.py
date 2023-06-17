@@ -252,6 +252,6 @@ class mattingwidget(QWidget):
 
 if __name__=='__main__':
     app =QApplication(sys.argv)
-    stw= idwidget()
+    stw= mattingwidget()
     stw.show()
     sys.exit(app.exec_())
